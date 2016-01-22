@@ -1,5 +1,6 @@
 package mcg.maze;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -13,7 +14,7 @@ public class Maze {
    int EAST = 4;
    int WEST = 8;
    
-   private Cell[][] grid;
+   private ArrayList<Cell> grid;
    
    HashSet<Cell> set = new HashSet<Cell>();
    
@@ -29,13 +30,13 @@ public class Maze {
       generateMaze();
    }
 
-   private Cell[][] generateGrid() {
-      Cell[][] grid = new Cell[sizeX][sizeY];
+   private ArrayList<Cell> generateGrid() {
+      ArrayList<Cell> grid = new ArrayList<Cell>();
       
       for (int y = 0; y < sizeY; y++) {
          for (int x = 0; x < sizeX; x++) {
             Cell cell = new Cell(x, y);
-            grid[x][y] = cell;
+            grid.add(cell);
          }
       }
       
@@ -43,11 +44,11 @@ public class Maze {
    }
    
    private void generateMaze() {
-      Cell[][] region = grid;
+      ArrayList<Cell> region = grid;
       split(region);
    }
    
-   private void split(Cell[][] region) {
+   private void split(ArrayList<Cell> region) {
       Cell seedA = getRandomCell();
       Cell seedB = getRandomCell();
       
@@ -55,14 +56,14 @@ public class Maze {
    }
    
    private Cell getCell(int x, int y) {
-      return grid[x][y];
+      return grid.stream().filter(c -> c.x == x && c.y == y).findFirst().get();
    }
    
    private Cell getRandomCell() {
       int x = ThreadLocalRandom.current().nextInt(0, sizeX);
       int y = ThreadLocalRandom.current().nextInt(0, sizeY);
       
-      return grid[x][y];
+      return getCell(x,y);
    }
    
    protected class Cell {
