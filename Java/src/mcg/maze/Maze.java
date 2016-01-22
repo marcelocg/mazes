@@ -1,7 +1,6 @@
 package mcg.maze;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze {
@@ -9,14 +8,17 @@ public class Maze {
    int sizeX;
    int sizeY;
    
-   int NORTH = 1;
-   int SOUTH = 2;
-   int EAST = 4;
-   int WEST = 8;
+   static int NORTH = 1;
+   static int SOUTH = 2;
+   static int EAST = 4;
+   static int WEST = 8;
+
+   static int A = 1;
+   static int B = 2;
    
    private ArrayList<Cell> grid;
    
-   HashSet<Cell> set = new HashSet<Cell>();
+   ArrayList<Cell> set = new ArrayList<Cell>();
    
    public Maze() {
       this(3,3);
@@ -51,8 +53,16 @@ public class Maze {
    private void split(ArrayList<Cell> region) {
       Cell seedA = getRandomCell();
       Cell seedB = getRandomCell();
+
+      seedA.setRegion(A);
+      seedB.setRegion(B);
       
-      set.add(seedA); set.add(seedB);
+      set.add(seedA); 
+      set.add(seedB);
+      
+      Cell currentCell = set.remove(ThreadLocalRandom.current().nextInt(0, set.size()));
+      
+      
    }
    
    private Cell getCell(int x, int y) {
@@ -69,6 +79,8 @@ public class Maze {
    protected class Cell {
       int x;
       int y;
+      
+      int region;
       
       boolean borderNorth = false;
       boolean borderEast  = false;
@@ -107,6 +119,14 @@ public class Maze {
          borderWest  = (borders & WEST)  > 0;
       }
 
+      public void setRegion(int region) {
+         this.region = region;
+      }
+      
+      public int getRegion() {
+         return this.region;
+      }
+      
    }
 
    public static void main(String[] args) {
