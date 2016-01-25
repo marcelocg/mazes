@@ -2,6 +2,7 @@ package mcg.maze;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ public class Maze {
   static int EAST = 4;
   static int WEST = 8;
 
+  static int NO_REGION = 0;
   static int A = 1;
   static int B = 2;
 
@@ -52,39 +54,70 @@ public class Maze {
     split(region);
   }
 
-  private void split(ArrayList<Cell> region) {
-    Cell seedA = getRandomCell();
-    Cell seedB = getRandomCell();
-
+  public void print() {
+    //TODO Implement the print() method in Maze class.
+  }
+  
+  private void split(List<Cell> region) {
+    if (region.size() <= 4) return;
+    
+    region.stream()
+    .map(c -> 
+      {
+        c.setRegion(NO_REGION);
+        return c;
+      });
+    
+    Cell seedA = getRandomUnsplitCell(region);
     seedA.setRegion(A);
+
+    Cell seedB = getRandomUnsplitCell(region);
     seedB.setRegion(B);
 
     set.add(seedA);
     set.add(seedB);
 
-    Cell currentCell = set.remove(ThreadLocalRandom.current().nextInt(0, set.size()));
-    Collection<Cell> neghbors = currentCell.getNeighborhood().stream()
-                                 .filter(c -> !c.isInRegion())
-                                 .map(c -> 
-                                   {
-                                     c.setRegion(currentCell.getRegion());
-                                     return c;
-                                   })
-                                 .collect(Collectors.toList());
-    set.addAll(neghbors);
+    while (region.stream().filter(c -> !c.isInRegion()).count() > 0) {
+      Cell currentCell = set.remove(ThreadLocalRandom.current().nextInt(0, set.size()));
+      Collection<Cell> neighbors = currentCell.getNeighborhood().stream()
+          .filter(c -> !c.isInRegion())
+          .map(c -> 
+          {
+            c.setRegion(currentCell.getRegion());
+            return c;
+          })
+          .collect(Collectors.toList());
+      set.addAll(neighbors);
+    }
+    
+    buildWall(region);
+    
+    split(region.stream().filter(c -> c.getRegion() == A).collect(Collectors.toList()));
+    split(region.stream().filter(c -> c.getRegion() == B).collect(Collectors.toList()));
   }
 
+  private void buildWall(List<Cell> region) {
+    //TODO Implement the buildWall(region) method in Maze class.
+  }
+  
   private Cell getCell(int x, int y) {
     return grid.stream().filter(c -> c.x == x && c.y == y).findFirst().get();
   }
 
+/*  
   private Cell getRandomCell() {
     int x = ThreadLocalRandom.current().nextInt(0, sizeX);
     int y = ThreadLocalRandom.current().nextInt(0, sizeY);
 
     return getCell(x, y);
   }
-
+*/
+  
+  private Cell getRandomUnsplitCell(Collection<Cell> region) {
+    List<Cell> unsplitCells = region.stream().filter(c -> !c.isInRegion()).collect(Collectors.toList());
+    return unsplitCells.get(ThreadLocalRandom.current().nextInt(unsplitCells.size()));
+  }
+  
   protected class Cell {
     int x;
     int y;
@@ -186,8 +219,6 @@ public class Maze {
 
   public static void main(String[] args) {
     Maze maze = new Maze();
-
-    // TODO implement
-    // maze.print();
+    maze.print();
   }
 }
