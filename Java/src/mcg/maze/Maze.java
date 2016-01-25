@@ -98,6 +98,16 @@ public class Maze {
 
   private void buildWall(List<Cell> region) {
     //TODO Implement the buildWall(region) method in Maze class.
+    //1. Choose one subregion (A or B) from the region passed as argument
+    //2. For each cell in this subregion, 
+    // 2.1 For each of it's neighbors
+    //   2.1.1 test if the neighbor also belongs to the region
+    // 2.2 if the neighbor belongs to the region but is on a different subregion
+    //   2.2.1 put a wall between them
+    //   2.2.2 add the cell to a frontier collection
+    //3. Choose one random cell from the frontier collection
+    //4. Choose one of the cell's walls
+    //5. Remove the wall
   }
   
   private Cell getCell(int x, int y) {
