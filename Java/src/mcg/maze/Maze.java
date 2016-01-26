@@ -1,6 +1,7 @@
 package mcg.maze;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,7 +26,7 @@ public class Maze {
   ArrayList<Cell> set = new ArrayList<Cell>();
 
   public Maze() {
-    this(3, 3);
+    this(4, 4);
   }
 
   public Maze(int sizeX, int sizeY) {
@@ -33,7 +34,8 @@ public class Maze {
     this.sizeY = sizeY;
 
     this.grid = generateGrid();
-    generateMaze();
+    
+    this.generateMaze();
   }
 
   private ArrayList<Cell> generateGrid() {
@@ -55,18 +57,19 @@ public class Maze {
   }
 
   public void print() {
-    //TODO Implement the print() method in Maze class.
+    System.out.println(this);
+  }
+  
+  private void clearRegionMarks(List<Cell> region) {
+    for (Cell cell : region) {
+      cell.setRegion(NO_REGION);
+    }
   }
   
   private void split(List<Cell> region) {
     if (region.size() <= 4) return;
     
-    region.stream()
-    .map(c -> 
-      {
-        c.setRegion(NO_REGION);
-        return c;
-      });
+    clearRegionMarks(region);
     
     Cell seedA = getRandomUnsplitCell(region);
     seedA.setRegion(A);
@@ -90,42 +93,94 @@ public class Maze {
       set.addAll(neighbors);
     }
     
-    buildWall(region);
+    buildBorder(region);
     
     split(region.stream().filter(c -> c.getRegion() == A).collect(Collectors.toList()));
     split(region.stream().filter(c -> c.getRegion() == B).collect(Collectors.toList()));
   }
 
-  private void buildWall(List<Cell> region) {
-    //TODO Implement the buildWall(region) method in Maze class.
-    //1. Choose one subregion (A or B) from the region passed as argument
-    //2. For each cell in this subregion, 
-    // 2.1 For each of it's neighbors
-    //   2.1.1 test if the neighbor also belongs to the region
-    // 2.2 if the neighbor belongs to the region but is on a different subregion
-    //   2.2.1 put a wall between them
-    //   2.2.2 add the cell to a frontier collection
+  private void buildBorder(List<Cell> region) {
+    List<Cell> border = new ArrayList<Cell>(); 
+ 
+    region.stream()
+      //1. Choose one subregion (A or B) from the region passed as argument
+      .filter(c -> c.getRegion() == A)
+      //2. For each cell in this subregion, 
+      .forEach(c -> c.getNeighborhood().stream()
+                      // 2.1 For each of it's neighbors that also belongs to the region
+                      // but is on a different subregion
+                      .filter(n -> region.contains(n) && n.getRegion() == B)
+                      .forEach(n -> { 
+                                      // 2.2.1 put a wall between them
+                                      buildWall(c, n);
+                                      // 2.2.2 add the cell to a border collection
+                                      border.add(c);
+                                    })
+               );
+    
     //3. Choose one random cell from the frontier collection
+    Cell cell = getRandomCell(border);
+    
     //4. Choose one of the cell's walls
+    List<Integer> walls = cell.getNeighborWallsList();
+    int wall = walls.get(ThreadLocalRandom.current().nextInt(0, walls.size()));
+    
     //5. Remove the wall
+    cell.setWalls(cell.getWalls() - wall);
   }
   
   private Cell getCell(int x, int y) {
     return grid.stream().filter(c -> c.x == x && c.y == y).findFirst().get();
   }
 
-/*  
-  private Cell getRandomCell() {
-    int x = ThreadLocalRandom.current().nextInt(0, sizeX);
-    int y = ThreadLocalRandom.current().nextInt(0, sizeY);
-
-    return getCell(x, y);
+  private void buildWall(Cell cell, Cell neighbor) {  
+    int border = 0;
+    
+    border += (neighbor.x == (cell.x + 1) ? EAST  : 0); 
+    border += (neighbor.x == (cell.x - 1) ? WEST  : 0); 
+    border += (neighbor.y == (cell.y + 1) ? SOUTH : 0); 
+    border += (neighbor.x == (cell.y - 1) ? NORTH : 0);
+    
+    cell.setWalls(cell.getWalls() + border);
   }
-*/
   
-  private Cell getRandomUnsplitCell(Collection<Cell> region) {
+  
+  private Cell getRandomCell(List<Cell> cells) {
+    return cells.get(ThreadLocalRandom.current().nextInt(cells.size()));
+  }
+
+  
+  private Cell getRandomUnsplitCell(List<Cell> region) {
     List<Cell> unsplitCells = region.stream().filter(c -> !c.isInRegion()).collect(Collectors.toList());
-    return unsplitCells.get(ThreadLocalRandom.current().nextInt(unsplitCells.size()));
+    return getRandomCell(unsplitCells);
+  }
+
+  public String toString() {
+    String string = "";
+
+    for (int x = 0;  x < sizeX; x++) {
+      string += "+---";
+    }
+    string += "+\n";
+
+    for (int y = 0; y < sizeY; y++) {
+      string += "|";
+      String bottom = "+";
+
+      for (int x = 0;  x < sizeX; x++) {
+        Cell cell = this.getCell(x, y);
+
+        string += "   ";
+        string += cell.wallEast ? "|" : " ";
+
+        bottom += cell.wallSouth ? "---" : "   ";
+        bottom += "+";
+      }
+
+      string += "\n" + bottom + "\n";
+    }
+
+    return string;
   }
   
   protected class Cell {
@@ -134,29 +189,33 @@ public class Maze {
 
     int region = 0;
 
-    boolean borderNorth = false;
-    boolean borderSouth = false;
-    boolean borderEast  = false;
-    boolean borderWest  = false;
+    boolean wallNorth = false;
+    boolean wallSouth = false;
+    boolean wallEast  = false;
+    boolean wallWest  = false;
 
     public Cell(int x, int y) {
       this.x = x;
       this.y = y;
 
-      int borders = 0;
+      int walls = 0;
 
       if (x == 0)
-        borders += WEST;
+        walls += WEST;
       if (y == 0)
-        borders += NORTH;
+        walls += NORTH;
       if (x == sizeX - 1)
-        borders += EAST;
+        walls += EAST;
       if (y == sizeY - 1)
-        borders += SOUTH;
+        walls += SOUTH;
 
-      setBorders(borders);
+      setWalls(walls);
     }
-
+    
+    public String toString() {
+      return "X: " + x + " Y: " + y + " Borders: " + this.whichWalls();
+    }
+    
     public boolean isInRegion() {
       return this.region != 0;
     }
@@ -202,19 +261,36 @@ public class Maze {
       return getCell(this.x-1, this.y);
     }
     
-    public String whichBorders() {
-      String borders;
+    public String whichWalls() {
+      String walls;
 
-      borders = (borderNorth ? "North" : "") + (borderSouth ? "South" : "") + (borderEast ? "East" : "") + (borderWest ? "West" : "");
+      walls = (wallNorth ? "North" : "") + (wallSouth ? "South" : "") + (wallEast ? "East" : "") + (wallWest ? "West" : "");
 
-      return borders;
+      return walls;
     }
 
-    public void setBorders(int borders) {
-      borderNorth = (borders & NORTH) > 0;
-      borderSouth = (borders & SOUTH) > 0;
-      borderEast  = (borders & EAST)  > 0;
-      borderWest  = (borders & WEST)  > 0;
+    public void setWalls(int borders) {
+      wallNorth = (borders & NORTH) > 0;
+      wallSouth = (borders & SOUTH) > 0;
+      wallEast  = (borders & EAST)  > 0;
+      wallWest  = (borders & WEST)  > 0;
+    }
+    
+    public int getWalls() {
+      return (wallNorth ? NORTH : 0) + (wallSouth ? SOUTH : 0) + (wallEast ? EAST : 0) + (wallWest ? WEST : 0);
+    }
+
+    public int getNeighborWalls() {
+      return (wallNorth && (y > 0) ? NORTH : 0) + (wallSouth && (y < sizeY-1) ? SOUTH : 0) + (wallEast && (x < sizeX-1) ? EAST : 0) + (wallWest && (x > 0) ? WEST : 0);
+    }
+
+    public List<Integer> getNeighborWallsList() {
+      int walls = getNeighborWalls();
+      List<Integer> borders = Arrays.asList(NORTH, SOUTH, EAST, WEST);
+      
+      return borders.stream()
+                   .filter(w -> (walls & w) > 0)
+                   .collect(Collectors.toList());
     }
 
     public void setRegion(int region) {
