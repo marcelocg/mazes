@@ -3,7 +3,9 @@ package mcg.maze;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public class Maze {
 
   private ArrayList<Cell> grid;
 
-  ArrayList<Cell> set = new ArrayList<Cell>();
+  Set<Cell> set = new HashSet<Cell>();
 
   public Maze() {
     this(4, 4);
@@ -81,15 +83,17 @@ public class Maze {
     set.add(seedB);
 
     while (region.stream().filter(c -> !c.isInRegion()).count() > 0) {
-      Cell currentCell = set.remove(ThreadLocalRandom.current().nextInt(0, set.size()));
+      Cell currentCell = set.toArray(new Cell[0])[ThreadLocalRandom.current().nextInt(0, set.size())];
+      set.remove(currentCell);
+      
       Collection<Cell> neighbors = currentCell.getNeighborhood().stream()
-          .filter(c -> !c.isInRegion())
-          .map(c -> 
-          {
-            c.setRegion(currentCell.getRegion());
-            return c;
-          })
-          .collect(Collectors.toList());
+                                                                .filter(c -> !c.isInRegion())
+                                                                .collect(Collectors.toList());
+      
+      for (Cell n : neighbors) {
+        n.setRegion(currentCell.getRegion());
+      }
+      
       set.addAll(neighbors);
     }
     
