@@ -1,7 +1,10 @@
 package mcg.maze;
 
+import java.awt.AWTException;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,13 +15,15 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
+
 public class Maze {
 
   int sizeX;
   int sizeY;
 
   //0-None, 1-Partial Mazes only, 2-Mazes and text
-  static int DEBUGLEVEL = 2;
+  static int DEBUGLEVEL = 1;
   static int THRESHOLD = 16;
   
   static int NORTH = 1;
@@ -29,7 +34,8 @@ public class Maze {
   static int NO_REGION = -1;
   static int A = 0;
   static int B = 1;
-
+  static int printNum = 0;
+  
   private ArrayList<Cell> grid;
 
   public static final char[] EXTENDED = { 0x00C7, 0x00FC, 0x00E9, 0x00E2,
@@ -95,6 +101,17 @@ public static final void printChar(int code) {
 
   public void print() {
     System.out.println(this);
+    Rectangle screen = new Rectangle(0,30,595,640);
+    try {
+      Robot robot = new Robot();
+      BufferedImage img = robot.createScreenCapture(screen);
+      File f = new File(String.format("/home/marcelo/mazes/screenshots/m%04d.png", printNum++));
+      ImageIO.write(img, "png", f);
+    } catch (AWTException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   private void clearRegionMarks() {
@@ -299,10 +316,8 @@ public static final void printChar(int code) {
       String RED = (char)27 + "[31m";
       String BLUE = (char)27 + "[34m";
       
-      System.out.println(RED + "Texto vermelho" + RESET);
-      
       String[] pics = {RESET + getAscii(32), RED + getAscii(176) + RESET, BLUE + getAscii(177) + RESET};
-      return ""+pics[region+1];
+      return pics[region+1];
     }
     
     public boolean isInRegion() {
@@ -434,19 +449,14 @@ public static final void printChar(int code) {
   }
 
   private void pause() {
-    try {
-      System.in.read(new byte[2]);
-    } catch (IOException e) {
-    }
-    
-    
-  
-    
+//    try {
+//      System.in.read(new byte[2]);
+//    } catch (IOException e) {
+//    }
   }
 
   public static void main(String[] args) {
-    //Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-    Maze maze = new Maze(30,30);
+    Maze maze = new Maze(24,24);
     maze.print();
   }
 }
