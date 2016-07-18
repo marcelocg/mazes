@@ -1,2 +1,0 @@
-defmodule Maze do
-end
