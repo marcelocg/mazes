@@ -23,8 +23,13 @@ public class Maze {
   int sizeY;
 
   //0-None, 1-Partial Mazes only, 2-Mazes and text
-  static int DEBUGLEVEL = 1;
-  static int THRESHOLD = 16;
+  static int DEBUGLEVEL = 0;
+  //0-do not save image, 1-save image
+  static int PRINT_TO_IMAGE = 0;
+  //1-do not use colors, 1-use colors
+  static int USE_COLORS = 0;
+  //minimum room size
+  static int THRESHOLD = 4;
   
   static int NORTH = 1;
   static int SOUTH = 2;
@@ -101,16 +106,18 @@ public static final void printChar(int code) {
 
   public void print() {
     System.out.println(this);
-    Rectangle screen = new Rectangle(0,30,595,640);
-    try {
-      Robot robot = new Robot();
-      BufferedImage img = robot.createScreenCapture(screen);
-      File f = new File(String.format("/home/marcelo/mazes/screenshots/m%04d.png", printNum++));
-      ImageIO.write(img, "png", f);
-    } catch (AWTException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    if(PRINT_TO_IMAGE == 1) {
+      Rectangle screen = new Rectangle(0,30,595,640);
+      try {
+        Robot robot = new Robot();
+        BufferedImage img = robot.createScreenCapture(screen);
+        File f = new File(String.format("/home/marcelo/mazes/screenshots/m%04d.png", printNum++));
+        ImageIO.write(img, "png", f);
+      } catch (AWTException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
   }
   
@@ -312,11 +319,18 @@ public static final void printChar(int code) {
     }
 
     public String getRegionPic() {
-      String RESET = (char)27 + "[0m";
-      String RED = (char)27 + "[31m";
-      String BLUE = (char)27 + "[34m";
+      String[] pics = null;
+      if(USE_COLORS == 1) {
+        String RESET = (char)27 + "[0m";
+        String RED = (char)27 + "[31m";
+        String BLUE = (char)27 + "[34m";
       
-      String[] pics = {RESET + getAscii(32), RED + getAscii(176) + RESET, BLUE + getAscii(177) + RESET};
+        String[] colored_pics = {RESET + getAscii(32), RED + getAscii(176) + RESET, BLUE + getAscii(177) + RESET};
+        pics = colored_pics;
+      } else {
+        String[] uncolored_pics = {" ", " ", " "};
+        pics = uncolored_pics;
+      }
       return pics[region+1];
     }
     
@@ -456,7 +470,7 @@ public static final void printChar(int code) {
   }
 
   public static void main(String[] args) {
-    Maze maze = new Maze(24,24);
+    Maze maze = new Maze(6,6);
     maze.print();
   }
 }
