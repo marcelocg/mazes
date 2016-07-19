@@ -41,6 +41,13 @@ public class Maze {
     this.generateMaze();
   }
 
+  public int getHeight() {
+    return this.sizeY;
+  }
+
+  public int getWidth() {
+    return this.sizeX;
+  }
   private ArrayList<Cell> generateGrid() {
     ArrayList<Cell> grid = new ArrayList<Cell>();
 
