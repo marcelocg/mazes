@@ -1,6 +1,9 @@
 package mcg.maze.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -71,6 +74,16 @@ public class TiledExporter {
   private static JSONArray toTileArray(Maze maze) {
 
     JSONArray tiles = new JSONArray();
+    
+    Integer start = 109;
+    ArrayList<Integer> tileset = new ArrayList<Integer>();
+    
+    for(int i=0; i<6; i++) {
+      tileset.addAll(IntStream.range(start,  start + 9).boxed().collect(Collectors.toList()));
+      start += 27;
+    }
+    
+    System.out.println(tileset);
     
     tiles.addAll(Arrays.asList( 109, 114, 141, 142, 112, 114, 
                                 139, 114, 139, 111, 113, 114, 
