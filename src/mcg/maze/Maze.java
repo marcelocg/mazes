@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import mcg.maze.utils.Constants;
+import mcg.maze.utils.TiledExporter;
 
 public class Maze {
 
@@ -252,5 +253,6 @@ public class Maze {
   public static void main(String[] args) {
     Maze maze = new Maze(6,6);
     maze.print();
+    TiledExporter.toJSON(maze);
   }
 }

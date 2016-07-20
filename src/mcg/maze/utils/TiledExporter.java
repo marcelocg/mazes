@@ -1,5 +1,8 @@
 package mcg.maze.utils;
 
+import java.util.Arrays;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import mcg.maze.Maze;
@@ -46,29 +49,36 @@ public class TiledExporter {
     tileset.put("tilewidth", 64);
 
     // For awhile, let's maintain the Kenney top-down shooter
-    // tileset as the only option. Thanks @Kenney_NL!
+    // tileset as the only option. Thanks @KenneyNL!
     // This file must be somehow available to the game engine
     // using this Tiled map
     tileset.put("image", "tilesheet_complete.png");
 
-    String[] layers = { mazeLayer.toString() };
-    String[] tilesets = { tileset.toString() };
+    JSONArray layers = new JSONArray();
+    layers.add(mazeLayer);
+    
+    JSONArray tilesets = new JSONArray();
+    tilesets.add(tileset);
 
     map.put("layers", layers);
     map.put("tilesets", tilesets);
 
-    System.out.print(map.toJSONString());
+    System.out.print(map);
     return "";
   }
 
-  private static int[] toTileArray(Maze maze) {
-    // TODO IMPLEMENT THIS!
-    int[] tiles = { 109, 114, 141, 142, 112, 114, 
-                    139, 114, 139, 111, 113, 114, 
-                    139, 111, 137, 109, 114, 141, 
-                    136, 112, 114, 138, 116, 220, 
-                    109, 113, 112, 113, 248, 247, 
-                    136, 114, 115, 142, 111, 137 };
+  @SuppressWarnings("unchecked")
+  private static JSONArray toTileArray(Maze maze) {
+
+    JSONArray tiles = new JSONArray();
+    
+    tiles.addAll(Arrays.asList( 109, 114, 141, 142, 112, 114, 
+                                139, 114, 139, 111, 113, 114, 
+                                139, 111, 137, 109, 114, 141, 
+                                136, 112, 114, 138, 116, 220, 
+                                109, 113, 112, 113, 248, 247, 
+                                136, 114, 115, 142, 111, 137  ));
+
     return tiles;
   }
 }
