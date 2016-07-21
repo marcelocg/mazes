@@ -75,22 +75,22 @@ public class TiledExporter {
 
     JSONArray tiles = new JSONArray();
     
-    Integer start = 109;
-    ArrayList<Integer> tileset = new ArrayList<Integer>();
+    // This should come from a configuration or preferences engine (cli param?)
+    Tileset tileset = Tileset.TARMAC_WOOD;
     
-    for(int i=0; i<6; i++) {
-      tileset.addAll(IntStream.range(start,  start + 9).boxed().collect(Collectors.toList()));
-      start += 27;
-    }
+    ArrayList<Integer> tilesetValues = new ArrayList<Integer>();
     
-    System.out.println(tileset);
+    int start = (tileset.id() * 54) + 1;
+    tilesetValues.addAll(IntStream.range(start,  start + 54).boxed().collect(Collectors.toList()));
     
-    tiles.addAll(Arrays.asList( 109, 114, 141, 142, 112, 114, 
-                                139, 114, 139, 111, 113, 114, 
-                                139, 111, 137, 109, 114, 141, 
-                                136, 112, 114, 138, 116, 220, 
-                                109, 113, 112, 113, 248, 247, 
-                                136, 114, 115, 142, 111, 137  ));
+    System.out.println(tilesetValues);
+    
+    tiles.addAll(Arrays.asList( 109-108, 114-108, 141-108, 142-108, 112-108, 114-108, 
+                                139-108, 114-108, 139-108, 111-108, 113-108, 114-108, 
+                                139-108, 111-108, 137-108, 109-108, 114-108, 141-108, 
+                                136-108, 112-108, 114-108, 138-108, 116-108, 220-108, 
+                                109-108, 113-108, 112-108, 113-108, 248-108, 247-108, 
+                                136-108, 114-108, 115-108, 142-108, 111-108, 137-108  ));
 
     return tiles;
   }
