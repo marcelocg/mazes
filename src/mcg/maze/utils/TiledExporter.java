@@ -2,6 +2,7 @@ package mcg.maze.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -76,14 +77,7 @@ public class TiledExporter {
     JSONArray tiles = new JSONArray();
     
     // This should come from a configuration or preferences engine (cli param?)
-    Tileset tileset = Tileset.TARMAC_WOOD;
-    
-    ArrayList<Integer> tilesetValues = new ArrayList<Integer>();
-    
-    int start = (tileset.id() * 54) + 1;
-    tilesetValues.addAll(IntStream.range(start,  start + 54).boxed().collect(Collectors.toList()));
-    
-    System.out.println(tilesetValues);
+    List<Integer> tileIndexes = initTileset(Tileset.TARMAC_BRICK);
     
     tiles.addAll(Arrays.asList( 109-108, 114-108, 141-108, 142-108, 112-108, 114-108, 
                                 139-108, 114-108, 139-108, 111-108, 113-108, 114-108, 
@@ -93,5 +87,18 @@ public class TiledExporter {
                                 136-108, 114-108, 115-108, 142-108, 111-108, 137-108  ));
 
     return tiles;
+  }
+
+  private static ArrayList<Integer> initTileset(Integer patternId) {
+    ArrayList<Integer> tilesetValues = new ArrayList<Integer>();
+    
+    // Calculate the offset to the correct pattern inside de tileset image file
+    // The +1 term is because Tiled uses 0-based index for the tileset 
+    // but 1-based index in JSON map data
+    int start = (patternId * Tileset.SIZE) + 1;
+    
+    tilesetValues.addAll(IntStream.range(start,  start + 54).boxed().collect(Collectors.toList()));
+    
+    return tilesetValues;
   }
 }
