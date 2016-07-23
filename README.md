@@ -1,2 +1,2 @@
 # Mazes
-Experiments with maze generation algorithms in different languages
+Experiments with procedural maze generation algorithms
