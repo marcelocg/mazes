@@ -10,11 +10,6 @@ public class Constants {
 	// minimum room size
 	public static int THRESHOLD = 4;
 
-	public static int NORTH = 1;
-	public static int SOUTH = 2;
-	public static int EAST = 4;
-	public static int WEST = 8;
-
 	public static int NO_REGION = -1;
 	public static int A = 0;
 	public static int B = 1;

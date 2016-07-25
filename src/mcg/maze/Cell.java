@@ -23,6 +23,11 @@ public class Cell {
     boolean wallEast  = false;
     boolean wallWest  = false;
 
+    public static int NORTH = 1;
+    public static int SOUTH = 2;
+    public static int EAST = 4;
+    public static int WEST = 8;
+
     public Cell(int x, int y, Maze maze) {
       this.x = x;
       this.y = y;
@@ -31,13 +36,13 @@ public class Cell {
       int walls = 0;
 
       if (x == 0)
-        walls += Constants.WEST;
+        walls += WEST;
       if (y == 0)
-        walls += Constants.NORTH;
+        walls += NORTH;
       if (x == maze.sizeX - 1)
-        walls += Constants.EAST;
+        walls += EAST;
       if (y == maze.sizeY - 1)
-        walls += Constants.SOUTH;
+        walls += SOUTH;
 
       setWalls(walls);
     }
@@ -125,30 +130,30 @@ public class Cell {
     }
 
     public void setWalls(int borders) {
-      wallNorth = (borders & Constants.NORTH) > 0;
-      wallSouth = (borders & Constants.SOUTH) > 0;
-      wallEast  = (borders & Constants.EAST)  > 0;
-      wallWest  = (borders & Constants.WEST)  > 0;
+      wallNorth = (borders & NORTH) > 0;
+      wallSouth = (borders & SOUTH) > 0;
+      wallEast  = (borders & EAST)  > 0;
+      wallWest  = (borders & WEST)  > 0;
     }
     
     public int getAllWalls() {
-      return (wallNorth ? Constants.NORTH : 0) + (wallSouth ? Constants.SOUTH : 0) + (wallEast ? Constants.EAST : 0) + (wallWest ? Constants.WEST : 0);
+      return (wallNorth ? NORTH : 0) + (wallSouth ? SOUTH : 0) + (wallEast ? EAST : 0) + (wallWest ? WEST : 0);
     }
 
     public int getBorderWalls() {
       int borderWalls = 0;
       
-      if(wallNorth && (y > 0)       && isInDifferentRegion(getNeighbor(Constants.NORTH))) borderWalls += Constants.NORTH;
-      if(wallSouth && (y < maze.sizeY-1) && isInDifferentRegion(getNeighbor(Constants.SOUTH))) borderWalls += Constants.SOUTH;
-      if(wallEast &&  (x < maze.sizeX-1) && isInDifferentRegion(getNeighbor(Constants.EAST)))  borderWalls += Constants.EAST;
-      if(wallWest &&  (x > 0)       && isInDifferentRegion(getNeighbor(Constants.WEST)))  borderWalls += Constants.WEST;
+      if(wallNorth && (y > 0)       && isInDifferentRegion(getNeighbor(NORTH))) borderWalls += NORTH;
+      if(wallSouth && (y < maze.sizeY-1) && isInDifferentRegion(getNeighbor(SOUTH))) borderWalls += SOUTH;
+      if(wallEast &&  (x < maze.sizeX-1) && isInDifferentRegion(getNeighbor(EAST)))  borderWalls += EAST;
+      if(wallWest &&  (x > 0)       && isInDifferentRegion(getNeighbor(WEST)))  borderWalls += WEST;
           
       return borderWalls;
     }
 
     public List<Integer> getNeighborWallsList() {
       int walls = getBorderWalls();
-      List<Integer> borders = Arrays.asList(Constants.NORTH, Constants.SOUTH, Constants.EAST, Constants.WEST);
+      List<Integer> borders = Arrays.asList(NORTH, SOUTH, EAST, WEST);
       
       return borders.stream()
                    .filter(b -> (walls & b) > 0) // select the walls that are set
@@ -156,9 +161,9 @@ public class Cell {
     }
 
     public Cell getNeighbor(int direction) {
-      if (direction == Constants.NORTH) return this.getNorthNeighbor();
-      else if (direction == Constants.SOUTH) return this.getSouthNeighbor();
-      else if (direction == Constants.WEST) return this.getWestNeighbor();
+      if (direction == NORTH) return this.getNorthNeighbor();
+      else if (direction == SOUTH) return this.getSouthNeighbor();
+      else if (direction == WEST) return this.getWestNeighbor();
       else return this.getEastNeighbor();
     }
     
@@ -175,10 +180,10 @@ public class Cell {
       this.setWalls(this.getAllWalls() - wall);
       
       int neighborWall = 0;
-      if (wall == Constants.NORTH) neighborWall = Constants.SOUTH;
-      if (wall == Constants.SOUTH) neighborWall = Constants.NORTH;
-      if (wall == Constants.WEST) neighborWall = Constants.EAST;
-      if (wall == Constants.EAST) neighborWall = Constants.WEST;
+      if (wall == NORTH) neighborWall = SOUTH;
+      if (wall == SOUTH) neighborWall = NORTH;
+      if (wall == WEST) neighborWall = EAST;
+      if (wall == EAST) neighborWall = WEST;
 
       Cell neighbor = this.getNeighbor(wall);
       neighbor.setWalls(neighbor.getAllWalls() - neighborWall);
