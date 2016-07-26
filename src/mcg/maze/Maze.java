@@ -186,15 +186,15 @@ public class Maze {
     int border = 0;
     int borderNeighbor = 0;
     
-    border += (neighbor.x == (cell.x + 1) ? Constants.EAST  : 0); 
-    border += (neighbor.x == (cell.x - 1) ? Constants.WEST  : 0); 
-    border += (neighbor.y == (cell.y + 1) ? Constants.SOUTH : 0); 
-    border += (neighbor.y == (cell.y - 1) ? Constants.NORTH : 0);
+    border += (neighbor.x == (cell.x + 1) ? Cell.EAST  : 0); 
+    border += (neighbor.x == (cell.x - 1) ? Cell.WEST  : 0); 
+    border += (neighbor.y == (cell.y + 1) ? Cell.SOUTH : 0); 
+    border += (neighbor.y == (cell.y - 1) ? Cell.NORTH : 0);
 
-    borderNeighbor += (cell.x == (neighbor.x + 1) ? Constants.EAST  : 0); 
-    borderNeighbor += (cell.x == (neighbor.x - 1) ? Constants.WEST  : 0); 
-    borderNeighbor += (cell.y == (neighbor.y + 1) ? Constants.SOUTH : 0); 
-    borderNeighbor += (cell.y == (neighbor.y - 1) ? Constants.NORTH : 0);
+    borderNeighbor += (cell.x == (neighbor.x + 1) ? Cell.EAST  : 0); 
+    borderNeighbor += (cell.x == (neighbor.x - 1) ? Cell.WEST  : 0); 
+    borderNeighbor += (cell.y == (neighbor.y + 1) ? Cell.SOUTH : 0); 
+    borderNeighbor += (cell.y == (neighbor.y - 1) ? Cell.NORTH : 0);
     
     cell.setWalls(cell.getAllWalls() + border);
     neighbor.setWalls(neighbor.getAllWalls() + borderNeighbor);
@@ -230,9 +230,9 @@ public class Maze {
         Cell cell = this.getCell(x, y);
 
         string += " "+ cell.getRegionPic() +" ";
-        string += cell.wallEast ? "|" : " ";
+        string += cell.hasEastWall() ? "|" : " ";
 
-        bottom += cell.wallSouth ? "---" : "   ";
+        bottom += cell.hasSouthWall() ? "---" : "   ";
 //        bottom += "+";
         bottom += " ";
       }
@@ -251,8 +251,20 @@ public class Maze {
   }
 
   public static void main(String[] args) {
-    Maze maze = new Maze(6,6);
-    maze.print();
+    long start = System.currentTimeMillis();
+    Maze maze = new Maze(96,96);
+    long finish = System.currentTimeMillis();
+    long duration = finish - start;
+
+    System.out.printf("Creation time: %d\n", duration);
+
+//    maze.print();
+
+    start = System.currentTimeMillis();
     TiledExporter.toJSON(maze);
+    finish = System.currentTimeMillis();
+    duration = finish - start;
+
+    System.out.printf("Export time: %d\n", duration);
   }
 }

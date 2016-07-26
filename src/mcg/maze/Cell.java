@@ -18,16 +18,25 @@ public class Cell {
 
     private Maze maze;
     
-    boolean wallNorth = false;
-    boolean wallSouth = false;
-    boolean wallEast  = false;
-    boolean wallWest  = false;
+    private boolean wallNorth = false;
+    private boolean wallSouth = false;
+    private boolean wallEast  = false;
+    private boolean wallWest  = false;
 
-    public static int NORTH = 1;
-    public static int SOUTH = 2;
-    public static int EAST = 4;
-    public static int WEST = 8;
+    public static final int NO_WALLS = 0;
+    public static final int NORTH    = 1;
+    public static final int SOUTH    = 2;
+    public static final int EAST     = 4;
+    public static final int WEST     = 8;
+    
+    public static final int HORIZONTAL_PASSAGE = NORTH + SOUTH;
+    public static final int VERTICAL_PASSAGE   = EAST + WEST;
 
+    public static final int NORTH_DEAD_END = NORTH + EAST + WEST;
+    public static final int SOUTH_DEAD_END = SOUTH + EAST + WEST;
+    public static final int EAST_DEAD_END  = NORTH + SOUTH + EAST;
+    public static final int WEST_DEAD_END  = NORTH + SOUTH + WEST;
+    
     public Cell(int x, int y, Maze maze) {
       this.x = x;
       this.y = y;
@@ -47,6 +56,22 @@ public class Cell {
       setWalls(walls);
     }
     
+    public boolean hasNorthWall() {
+      return wallNorth;
+    }
+
+    public boolean hasSouthWall() {
+      return wallSouth;
+    }
+  
+    public boolean hasEastWall() {
+      return wallEast;
+    }
+  
+    public boolean hasWestWall() {
+      return wallWest;
+    }
+  
     public String toString() {
       return "(" + x + "," + y + ") Region: " + getRegionName() + " Borders: " + this.whichWalls();
     }
